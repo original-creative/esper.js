@@ -154,7 +154,6 @@ class Value {
 		if ( typeof v.call === 'function' ) {
 			switch ( realm ? realm.options.bookmarkInvocationMode : '' ) {
 				case 'loop':
-
 					out = function Bookmark() {
 						let Evaluator = require('./Evaluator');
 						let cthis = realm.makeForForeignObject(this);
@@ -169,6 +168,37 @@ class Value {
 						return result.value.toNative();
 					};
 					break;
+        case 'async':
+            out = function BookmarkAsync() {
+              let Evaluator = require('./Evaluator');
+              let cthis = realm.makeForForeignObject(this);
+              let c = v.call(cthis, Array.from(arguments).map((v) => realm.makeForForeignObject(v)), realm.globalScope);
+              let evalu = new Evaluator(realm, null, realm.globalScope);
+              evalu.pushFrame({type: 'program', generator: c, scope: realm.globalScope});
+              let gen = evalu.generator();
+              function handler(value) {
+                while ( !value.done ) {
+                  value = gen.next();
+                  if ( value.value && value.value.then ) {
+                    return value.value.then((v) => {
+                      return handler({done: false, value: v});
+                    });
+                  }
+                }
+                return value;
+              }
+              return new Promise(function(resolve, reject) {
+                try {
+                  let value = gen.next();
+                  resolve(value);
+                } catch ( e ) {
+                  reject(e);
+                }
+              }).then(handler).then((v) => {
+                return v.value.toNative();
+              });
+            };
+            break;
 				default:
 					out = function Bookmark() { throw new Error('Atempted to invoke bookmark for ' + v.debugString); };
 			}

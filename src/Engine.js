@@ -292,6 +292,39 @@ class Engine {
 		};
 	}
 
+  fetchFunctionAsync(name) {
+		var genfx = this.fetchFunction(name, (engine, evaluator, value) => {
+      if (value && value.then) return true;
+      return false;
+    });
+
+		return function() {
+			let gen = genfx.apply(this, arguments);
+
+      const handler = (value) => {
+        while ( !value.done ) {
+          value = gen.next();
+          if ( value.value && value.value.then ) {
+            return value.value.then((v) => {
+              return handler({done: false, value: v});
+            });
+          }
+        }
+        return value;
+      }
+      return new Promise(function(resolve, reject) {
+        try {
+          let value = gen.next();
+          resolve(value);
+        } catch ( e ) {
+          reject(e);
+        }
+      }).then(handler).then((v) => {
+        return v.value;
+      });
+		};
+	}
+
 	fetchFunction(name, shouldYield) {
 		var val = this.globalScope.get(name);
 		return this.makeFunctionFromClosure(val, shouldYield);
@@ -411,7 +444,7 @@ class Engine {
 		while ( !value.done ) {
 			if ( !shouldYield ) yield;
 			else if ( evaluator.topFrame.type == 'await' ) {
-				if ( !value.value.resolved ) yield;
+				if ( !value.value.resolved ) yield value.value;
 			} else {
 				var yieldValue = shouldYield(this, evaluator, value.value);
 				if ( yieldValue !== false ) yield yieldValue;
