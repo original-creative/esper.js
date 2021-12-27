@@ -2,7 +2,7 @@
   "name": "esper.js",
   "version": "0.5.0-dev",
   "description": "Esper javascript interperter.",
-  "main": "src/index.js",
+  "main": "dist/esper.js",
   "scripts": {
     "doc": "esdoc -c esdoc.json",
     "lint": "jshint src --show-non-errors",
