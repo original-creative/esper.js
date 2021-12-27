@@ -44,4 +44,3 @@ contrib/test-suites/duktape/*
 contrib/test-suites/test262/*
 contrib/test-suites/js-corpus/expected.json
 coverage/*
-dist/*

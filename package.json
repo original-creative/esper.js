@@ -12,8 +12,6 @@
     "demo": "esdoc -c esdoc.json && node contrib/examine-corpus.js && webpack && webpack --env.test && webpack --env.test --env.profile=modern && node contrib/ui.js",
     "cover": "./node_modules/istanbul/lib/cli.js cover node_modules/.bin/_mocha -- --reporter dot",
     "dev-server": "webpack-dev-server src/index.js --content-base contrib/ui",
-    "preinstall": "node contrib/install-plugin-deps.js",
-    "prepublish": "node contrib/build.js",
     "style": "jscs src plugins/*/*.js test/*.js"
   },
   "bin": {
