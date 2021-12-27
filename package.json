@@ -34,16 +34,6 @@
     "url": "https://github.com/codecombat/esper.js/issues"
   },
   "homepage": "https://github.com/codecombat/esper.js#readme",
-  "files": [
-    "dist/esper.js",
-    "dist/esper.min.js",
-    "dist/esper.modern.js",
-    "src",
-    "plugins",
-    "contrib/cli.js",
-    "contrib/install-plugin-deps.js",
-    "plugin-list.js"
-  ],
   "devDependencies": {
     "@babel/core": "^7.4.3",
     "babel-loader": "^7.1.4",
